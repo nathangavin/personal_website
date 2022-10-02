@@ -1,0 +1,32 @@
+body {
+    margin: 0px;
+}
+
+#header {
+    width: 100%;
+    background-color: #0000FF;
+    color: white;
+    font-family: sans-serif;
+    padding: 10px;
+}
+
+#header > div {
+    display: inline;
+}
+
+#header_title h3 {
+    display: inline;
+    padding: 5px;
+}
+
+#header_logo {
+    font-weight: 700;
+    font-size: 30px; 
+}
+
+#header_logo a {
+    background-color: white;
+    padding: 5px;
+    border-radius: 5px;
+    text-decoration: none;
+}
