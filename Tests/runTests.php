@@ -23,8 +23,9 @@
     // $contact->lastName = 'Gavin';
     // $contact->ID = 1;
     // Contact::syncTable();
-    // $contact = Contact::first("email = 'nathangavin987@gmail.com'");
-    // $contact->setPassword('Today$1234');
+    $contact = Contact::first("email = 'nathangavin987@gmail.com'");
+    $contact->login = "nathangavin";
+    $contact->setPassword('Today$1234');
     
     
 

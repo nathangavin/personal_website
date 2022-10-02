@@ -52,7 +52,7 @@
         public function setPassword($newPassword) {
             if (strlen($this->login->get()) > 0) {
                 $hash = password_hash($newPassword, PASSWORD_DEFAULT, ['cost' => 10]);
-                $this->hash->set($hash);
+                $this->passwordHash->set($hash);
                 $this->save();
             } else {
                 throw new ContactException('Cannot set password of contact with no Login');
@@ -191,10 +191,15 @@
                 $props = get_object_vars($this);
                 $id = $this->ID->get();
                 unset($props['ID']);
+                unset($props['changed']);
     
                 $fieldsNotPopulated = array();
     
                 foreach($props as $property) {
+                    // echo '<pre>';
+                    // // var_dump($property->isValueValid());
+                    // echo '</pre>';
+                    
                     if (!$property->isValueValid()) {
                         $fieldsNotPopulated[] = $property->getColumnName();
                     }
@@ -221,7 +226,7 @@
     
                     } else {
                         // update db
-                        var_dump('update');
+                        
                         $this->modifiedTime->set(time());
     
                         $query = "UPDATE Contact SET ";
