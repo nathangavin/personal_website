@@ -6,12 +6,24 @@
         private $type;
         private $value;
         private $constraints;
+        private $isForeignKey;
+        private $foreignKeyTable;
+        private $foreignKeyConstraints;
 
-        function __construct($name, $type, $value = null, $constraints = null) {
+        function __construct($name, 
+                            $type, 
+                            $value = null, 
+                            $constraints = null,
+                            $isForeignKey = false,
+                            $foreignKeyTable = null,
+                            $foreignKeyConstraints = null) {
             $this->name = $name;
             $this->type = $type;
             $this->constraints = $constraints;
             $this->value = $value;
+            $this->isForeignKey = $isForeignKey;
+            $this->foreignKeyTable = $foreignKeyTable;
+            $this->foreignKeyConstraints = $foreignKeyConstraints;
         }
 
         public function get() {
@@ -26,6 +38,10 @@
 
             $response = $this->name . ' ' . $this->type;
             if (!is_null($this->constraints)) $response .= ' ' . $this->constraints;
+            if ($this->isForeignKey) {
+                $response .= ',';
+                $response .= "CONSTRAINT (" . $this->name . ") REFERENCES " . $this->foreignKeyTable . " (ID) " . $this->foreignKeyConstraints;
+            }
             return $response;
             
         }
