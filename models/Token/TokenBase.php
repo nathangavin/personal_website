@@ -41,6 +41,9 @@
             return false;
         }
 
+        /**
+         * @throws TokenException always
+         */
         public function destroy() {
             throw new TokenException("Unable to manually destroy token");
         }

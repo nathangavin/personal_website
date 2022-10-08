@@ -10,7 +10,9 @@
 
     class SQL {
 
-
+        /**
+         * @throws SQLException
+         */
         private static function openConnection() {
             try {
                 $servername = SQL_details::$servername;
@@ -27,10 +29,17 @@
             }
         }
 
+        /**
+         * @param PDO $connection
+         */
         private static function closeConnection($connection) {
             $connection = null;
         }
 
+        /**
+         * @param string $query SQL SELECT statement
+         * @throws SQLException
+         */
         public static function select($query) {
             $isSelect = strpos($query, 'SELECT ') !== false;
             $isNotCreate = strpos($query, 'CREATE ') === false;
@@ -52,6 +61,10 @@
             return false;
         }
 
+        /**
+         * @param string $query SQL DELETE FROM statement
+         * @throws SQLException
+         */
         public static function delete($query) {
             $isDelete = strpos($query, 'DELETE FROM ') !== false;
             $containsWhere = strpos($query, 'WHERE ') !== false;
@@ -68,6 +81,9 @@
             return false;
         }
 
+        /**
+         * @param string $query SQL CREATE TABLE statement
+         */
         public static function createTable($query) {
             if (strpos($query, 'CREATE TABLE') !== false) {
                 return self::modifyTable($query);
@@ -75,6 +91,9 @@
             return false;
         }
 
+        /**
+         * @param string $query SQL DROP TABLE statement
+         */
         public static function deleteTable($query) {
             if (strpos($query, 'DROP TABLE') !== false) {
                 return self::modifyTable($query);
@@ -82,6 +101,9 @@
             return false;
         }
 
+        /**
+         * @param string $query SQL ALTER TABLE statement
+         */
         public static function updateTable($query) {
             if (strpos($query,'ALTER TABLE') !== false) {
                 return self::modifyTable($query);
@@ -89,6 +111,9 @@
             return false;
         }
 
+        /**
+         * @param array $queries array of multiple ALTER TABLE statements
+         */
         public static function updateMultipleColumns($queries) {
             $all_valid = true;
             foreach($queries as $query) {
@@ -104,6 +129,10 @@
             return false;
         }
 
+        /**
+         * @param string $query
+         * @throws SQLException
+         */
         private static function modifyTable($query) {
             $connection = self::openConnection();
             try {
@@ -115,11 +144,17 @@
             return true;
         }
 
+        /**
+         * @param string $tableName
+         */
         public static function checkTableExists($tableName) {
             $query = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = '$tableName';";
             return self::select($query);
         }
 
+        /**
+         * @param string $tableName
+         */
         public static function getTableColumns($tableName, $extras = false) {
             if ($extras) { 
                 $query = "SELECT COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH, IS_NULLABLE, COLUMN_KEY, EXTRA FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '$tableName';";
@@ -130,6 +165,10 @@
             return self::select($query);
         }
 
+        /**
+         * @param string $query SQL INSERT INTO statement
+         * @throws SQLException
+         */
         public static function insert($query) {
             $connection = self::openConnection();
             try {
@@ -142,6 +181,10 @@
             return $last_id;
         }
 
+        /**
+         * @param array $queries array of multiple SQL INSERT INTO statements
+         * @throws SQLException
+         */
         public static function insertMultiple($queries) {
             $connection = self::openConnection();
             $ids = array();
@@ -162,6 +205,10 @@
             return $ids;
         }
 
+        /**
+         * @param string $query SQL UPDATE statement
+         * @throws SQLException
+         */
         public static function update($query) {
             $connection = self::openConnection();
             try {

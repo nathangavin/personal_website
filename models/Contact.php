@@ -52,6 +52,10 @@
 
         }
 
+        /**
+         * @param string $newPassword
+         * @throws ContactException when contact login isn't set
+         */
         public function setPassword($newPassword) {
             if (strlen($this->login->get()) > 0) {
                 $hash = password_hash($newPassword, PASSWORD_DEFAULT, ['cost' => 10]);
@@ -94,6 +98,9 @@
             return new self();
         }
 
+        /**
+         * @throws ContactException unable to delete Contact
+         */
         public function destroy() {
             $id = $this->ID->get();
             $deleteQuery = "DELETE FROM Contact WHERE ID = $id;";
@@ -199,6 +206,9 @@
             return null;
         }
 
+        /**
+         * @throws ContactException Required fields not populated
+         */
         public function save() {
             /*
                 extract id
@@ -306,6 +316,4 @@
         }
 
     }
-
-
 ?>

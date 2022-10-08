@@ -16,6 +16,10 @@
         protected $modifiedTime;
         protected $changed;
         
+        /**
+         * @param array $row associative array of columns and values from database
+         * @return self
+         */
         protected function __construct($row = null) {
             $ID = isset($row['ID']) ? (int) $row['ID'] : null;
             $createdTime = isset($row['createdTime']) ? (int) $row['createdTime'] : time();
@@ -28,13 +32,36 @@
         }
         
         public abstract static function syncTable();
+
+        /**
+         * @return self
+         */
         public abstract static function create();
+
+        /**
+         * @param int $id
+         * @return self|null
+         */
         public abstract static function fetch($id);
+
         public abstract function save();
+
+        /**
+         * @param string $where A SQL filter statement
+         * @return self|null
+         */
         public abstract static function first($where);
+
+        /**
+         * @param string $where A SQL filter statement
+         * @return self|null
+         */
         public abstract static function find($where);
         public abstract function destroy();
 
+        /**
+         * @throws BaseObjectException
+         */
         public function __set($property, $value) {
             switch($property) {
                 case 'ID';
