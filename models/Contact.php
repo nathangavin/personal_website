@@ -8,6 +8,24 @@
         }
     }
 
+    class LoginResponse {
+
+        /**
+         * @param bool $succeeded
+         * @param int $contactID
+         * @return self
+         */
+        public function __construct($succeeded, $contactID = null)
+        {
+            $this->succeeded = $succeeded;
+            if ($this->succeeded) {
+                $this->contactID = $contactID;
+            } else {
+                $this->contactExists = !is_null($contactID) ? true : false;
+            }
+        }
+    }
+
     class Contact extends Base {
 
         private $firstName;
@@ -32,21 +50,6 @@
             $this->passwordHash = new Field('passwordHash', 'VARCHAR(256)', $passwordHash);
             $this->login = new Field('login', 'VARCHAR(100)', $login, 'UNIQUE');
 
-            /*
-
-                add column - salt varchar(32)
-                add column - hashed password varchar(256)
-                add column - login/username 100 varchar(100)
-                
-                add function for setting password 
-                    generates new salt and hashes password
-                add function for logging in
-                    use salt and hashing function to create hash, 
-                    compare against stored hash
-
-
-            */
-
         }
 
         public function setPassword($newPassword) {
@@ -60,11 +63,31 @@
             
         }
         
+        /**
+         * @param string $login 
+         * @param string $password
+         * @return LoginResponse 
+         */
         public static function doLogin($login, $password) {
             // password_verify($password, $hash)
 
             $contact = self::first("Login = '$login'");
-            
+
+            if ($contact) {
+                $id = $contact->id->get();
+                if (password_verify($password, $contact->passwordHash->get())) {
+                    // provided password matched salted hash
+
+                    return new LoginResponse(true, $id);
+                } else {
+                    // login process failed
+                    
+                    return new LoginResponse(false, $id);
+                } 
+            } else {
+                // contact doesnt exist
+                return new LoginResponse(false);
+            }
         }
 
         public static function create() {
