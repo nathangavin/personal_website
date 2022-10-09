@@ -26,7 +26,6 @@
         }
     }
 
-    // test
     class Contact extends Base {
 
         private $firstName;
