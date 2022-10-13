@@ -9,6 +9,14 @@
         }
     }
 
+    class FieldTypeEnum {
+        const VARCHAR = "string";
+        const BIGINT = "int";
+        const INT = "int";
+        const DOUBLE = "float";
+        const FLOAT = "float";
+    }
+
     abstract class Base {
 
         protected $ID;
@@ -21,14 +29,32 @@
          * @return self
          */
         protected function __construct($row = null) {
-            $ID = isset($row['ID']) ? (int) $row['ID'] : null;
-            $createdTime = isset($row['createdTime']) ? (int) $row['createdTime'] : time();
-            $modifiedTime = isset($row['modifiedTime']) ? (int) $row['modifiedTime'] : null;
+
+            // $ID = isset($row['ID']) ? (int) $row['ID'] : null;
+            // $createdTime = isset($row['createdTime']) ? (int) $row['createdTime'] : time();
+            // $modifiedTime = isset($row['modifiedTime']) ? (int) $row['modifiedTime'] : null;
+
+            $ID = self::getValueFromRow($row, 'ID', null, FieldTypeEnum::INT);
+            $createdTime = self::getValueFromRow($row, 'createdTime', time(), FieldTypeEnum::INT);
+            $modifiedTime = self::getValueFromRow($row, 'modifiedTime', null, FieldTypeEnum::INT);
 
             $this->ID = new Field('ID', 'INT', $ID, 'NOT NULL PRIMARY KEY AUTO_INCREMENT');
             $this->createdTime = new Field('createdTime', 'BIGINT', $createdTime, 'NOT NULL');
             $this->modifiedTime = new Field('modifiedTime', 'BIGINT', $modifiedTime);
             $this->changed = false;
+        }
+
+        /**
+         * @param array $row associative array of columns and values from database
+         * @param string $key the key to get the value from the $row array
+         * @param mixed $falseValue the value to use if the $row array doesnt contain a value
+         * @param FieldTypeEnum $type a enum value of the type the value should be cast to
+         * @return mixed $value
+         */
+        protected static function getValueFromRow($row, $key, $falseValue = null, $type = FieldTypeEnum::VARCHAR) {
+            $value = isset($row[$key]) ? $row[$key] : $falseValue;
+            settype($value, $type);
+            return $value;
         }
         
         public abstract static function syncTable();

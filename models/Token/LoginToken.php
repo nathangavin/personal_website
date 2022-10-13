@@ -16,33 +16,34 @@
             parent::__construct();
             
             // add contact foreign key
-            $contactID = isset($row['contactID']) ? $row['contactID'] : null;
+            // $contactID = isset($row['contactID']) ? $row['contactID'] : null;
+            $contactID = parent::getValueFromRow($row, 'contactID', null, FieldTypeEnum::INT);
 
             $this->contactID = new Field('contactID', 'INT', $contactID, "NOT NULL", true, 'Contact', 'ON DELETE CASCADE ON UPDATE RESTRICT');
             
         }
 
         protected function deleteToken() {
-            
+            // TODO
         }
         public static function syncTable() {
-
+            // TODO
         }
         public static function create() {
-
+            // TODO
         }
         public static function fetch($id) {
-
+            // TODO
         }
         public function save() {
-
+            // TODO
         }
         public static function first($where) {
-
+            // TODO
         }
         public static function find($where) {
-
-        }
+            // TODO
+        }   
     }
 
 

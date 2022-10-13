@@ -38,12 +38,17 @@
         private function __construct($row = null) {
             parent::__construct($row);
 
-            $firstName = isset($row['firstName']) ? $row['firstName'] : null;
-            $lastName = isset($row['lastName']) ? $row['lastName'] : null;
-            $email = isset($row['email']) ? $row['email'] : null;
-            $salt = isset($row['salt']) ? $row['salt'] : null;
-            $passwordHash = isset($row['passwordHash']) ? $row['passwordHash'] : null;
-            $login = isset($row['login']) ? $row['login'] : null;
+            // $firstName = isset($row['firstName']) ? $row['firstName'] : null;
+            // $lastName = isset($row['lastName']) ? $row['lastName'] : null;
+            // $email = isset($row['email']) ? $row['email'] : null;
+            // $passwordHash = isset($row['passwordHash']) ? $row['passwordHash'] : null;
+            // $login = isset($row['login']) ? $row['login'] : null;
+            
+            $firstName = parent::getValueFromRow($row, 'firstName');
+            $lastName = parent::getValueFromRow($row, 'lastName');
+            $email = parent::getValueFromRow($row, 'email');
+            $passwordHash = parent::getValueFromRow($row, 'passwordHash');
+            $login = parent::getValueFromRow($row, 'login');
 
             $this->firstName = new Field('firstName', 'VARCHAR(30)', $firstName);
             $this->lastName = new Field('lastName', 'VARCHAR(30)', $lastName);
