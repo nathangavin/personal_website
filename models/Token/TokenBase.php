@@ -24,12 +24,15 @@
         }
 
         protected abstract function deleteToken();
+        protected abstract function setExpiryTime();
 
         public function generateToken() {
             $bytes = random_bytes(50);
             $token = bin2hex($bytes);
             if (strlen($token) > 100) $token = substr($token, 0, 100);
             $this->token->set($token);
+            $this->setExpiryTime();
+            $this->changed = true;
         }
 
         public function isTokenExpired() {

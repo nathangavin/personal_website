@@ -91,7 +91,7 @@
         public function __set($property, $value) {
             switch($property) {
                 case 'ID';
-                    throw new BaseObjectException("Unable to set property $property on Contact object");
+                    throw new BaseObjectException("Unable to set property $property on object");
                     break;
                 case 'createdTime';
                     if (is_null($this->$property->get())) {
@@ -101,7 +101,7 @@
                         $this->$property->set($value);
                         $this->changed = true;
                     } else {
-                        throw new BaseObjectException("Unable to set property $property on Contact object");
+                        throw new BaseObjectException("Unable to set property $property on object");
                     }
                     break;
                 case 'modifiedTime':

@@ -132,7 +132,7 @@
                     throw new ContactException('Setting Salt not permitted');
                     break;
                 case 'passwordHash':
-                    throw new ContactException(' Setting passwordHash not permitted');
+                    throw new ContactException('Setting passwordHash not permitted');
                     break;
                 default:
                     $this->$property->set($value);
@@ -172,6 +172,7 @@
                 $queryStart = "ALTER TABLE Contact ";
 
                 foreach ($props as $property) {
+                    if (gettype($property) !== 'Field') continue;
                     $name = $property->getColumnName();
                     if ($name == 'ID') {
                         continue;
@@ -192,6 +193,7 @@
                 $query = "CREATE TABLE Contact (";
                 $lastProp = array_pop($props);
                 foreach ($props as $property) {
+                    if (gettype($property) !== 'Field') continue;
                     $query .= $property->formatSQLrow();
                     $query .= ', ';
                 }
@@ -235,6 +237,7 @@
                 $fieldsNotPopulated = array();
     
                 foreach($props as $property) {
+                    if (gettype($property) !== 'Field') continue;
                     // echo '<pre>';
                     // // var_dump($property->isValueValid());
                     // echo '</pre>';
@@ -253,6 +256,7 @@
                         $columns = "";
                         $values = "";
                         foreach ($props as $property) {
+                            if (gettype($property) !== 'Field') continue;
                             $columns .= $property->getColumnName() . ',';
                             $values .= $property->formatSQLvalue() . ',';
                         }
@@ -272,6 +276,7 @@
                         $where = "WHERE ID=$id";
                         $details = "";
                         foreach($props as $property) {
+                            if (gettype($property) !== 'Field') continue;
                             $column = $property->getColumnName();
                             if ($column == 'createdTime') {
                                 continue;
