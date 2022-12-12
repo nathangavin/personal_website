@@ -66,6 +66,10 @@
             if (strlen($this->login->get()) > 0) {
                 $hash = password_hash($newPassword, PASSWORD_DEFAULT, ['cost' => 10]);
                 $this->passwordHash->set($hash);
+                echo '<pre>';
+                var_dump($this);
+                echo '</pre>';
+                
                 $this->save();
             } else {
                 throw new ContactException('Cannot set password of contact with no Login');
@@ -275,13 +279,20 @@
                         $query = "UPDATE Contact SET ";
                         $where = "WHERE ID=$id";
                         $details = "";
+                        
+                        //var_dump($props);
                         foreach($props as $property) {
+                            echo '<pre>';
+                            var_dump(get_class($property));
+                            echo '</pre>';
+                            
                             if (gettype($property) !== 'Field') continue;
                             $column = $property->getColumnName();
                             if ($column == 'createdTime') {
                                 continue;
                             }
                             $details .= $column . "=" . $property->formatSQLvalue() . ", ";
+                            var_dump($details);
                         }
                         $details = substr($details, 0, strlen($details) - 2);
     

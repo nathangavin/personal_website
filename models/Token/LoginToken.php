@@ -30,7 +30,13 @@
         }
 
         protected function deleteToken() {
-            // TODO
+            $id = $this->ID->get();
+            $deleteQuery = "DELETE FROM LoginToken WHERE ID = $id;";
+            try {
+                SQL::delete($deleteQuery);
+            } catch (SQLException $e) {
+                throw new ContactException("Cannot delete LoginToken $id - $e->getMessage()");
+            }
         }
 
         public static function syncTable() {
@@ -85,6 +91,30 @@
 
         public static function create() {
             return new self();
+        }
+
+        public function __set($property, $value) {
+            switch($property) {
+                case 'ID';
+                    parent::__set($property, $value);
+                    break;
+                case 'createdTime';
+                    parent::__set($property, $value);
+                    break;
+                case 'modifiedTime':
+                    parent::__set($property, $value);
+                    break;
+                case 'salt':
+                    throw new ContactException('Setting Salt not permitted');
+                    break;
+                case 'passwordHash':
+                    throw new ContactException('Setting passwordHash not permitted');
+                    break;
+                default:
+                    $this->$property->set($value);
+                    $this->changed = true;
+                    break;
+            }
         }
 
         public static function fetch($id) {

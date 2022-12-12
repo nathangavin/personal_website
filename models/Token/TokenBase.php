@@ -44,6 +44,24 @@
             return false;
         }
 
+        public function __set($property, $value) {
+            switch($property) {
+                case 'expiryTime';
+                    throw new TokenException('Setting Salt not permitted');
+                    break;
+                case 'token';
+                    throw new TokenException('Setting Salt not permitted');
+                    break;
+                default:
+                    parent::__set($property, $value);
+                    break;
+            }
+        }
+
+        public function __get($property) {
+            return $this->$property->get();
+        }
+
         /**
          * @throws TokenException always
          */
