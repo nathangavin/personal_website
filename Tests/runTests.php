@@ -17,6 +17,8 @@
 
 
     require_once(__DIR__ . "/../models/Contact.php");
+    // require_once(__DIR__ . "/../models/Token/LoginToken.php");
+    // LoginToken::syncTable();
     
     // $contact->email = 'nathangavin987@gmail.com';
     // $contact->firstName = 'Nathan';
@@ -26,6 +28,10 @@
     $contact = Contact::first("email = 'nathangavin987@gmail.com'");
     $contact->login = "nathangavin";
     $contact->setPassword('Today$1234');
+
+    $loginResponse = Contact::doLogin("nathangavin", "Today$1234");
+
+    var_dump($loginResponse);
     
     
 

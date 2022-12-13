@@ -17,7 +17,6 @@
             parent::__construct();
             
             // add contact foreign key
-            // $contactID = isset($row['contactID']) ? $row['contactID'] : null;
             $contactID = parent::getValueFromRow($row, 'contactID', null, FieldTypeEnum::INT);
 
             $this->contactID = new Field('contactID', 'INT', $contactID, "NOT NULL", true, 'Contact', 'ON DELETE CASCADE ON UPDATE RESTRICT');
@@ -25,8 +24,13 @@
         }
 
         protected function setExpiryTime() {
-            $expiryTime = strtotime("+15 minutes", $this->createdTime->get());
-            $this->expiryTime->set($expiryTime);
+            $expiryTimeValue = strtotime("+15 minutes", $this->createdTime->get());
+            echo '<pre>';
+            var_dump($expiryTimeValue);
+            var_dump($this);
+            echo '</pre>';
+            
+            $this->expiryTime->set($expiryTimeValue);
         }
 
         protected function deleteToken() {
@@ -35,7 +39,7 @@
             try {
                 SQL::delete($deleteQuery);
             } catch (SQLException $e) {
-                throw new ContactException("Cannot delete LoginToken $id - $e->getMessage()");
+                throw new LoginTokenException("Cannot delete LoginToken $id - $e->getMessage()");
             }
         }
 
@@ -89,6 +93,9 @@
             }
         }
 
+        /**
+         * @return self
+         */
         public static function create() {
             return new self();
         }
@@ -104,11 +111,13 @@
                 case 'modifiedTime':
                     parent::__set($property, $value);
                     break;
-                case 'salt':
-                    throw new ContactException('Setting Salt not permitted');
-                    break;
-                case 'passwordHash':
-                    throw new ContactException('Setting passwordHash not permitted');
+                case 'contactID':
+                    
+                    if (!is_null($this->$property->get())) {
+                        throw new LoginTokenException('Setting ContactID not permitted');
+                    } else {
+                        $this->$property->set($value);
+                    }
                     break;
                 default:
                     $this->$property->set($value);
@@ -138,7 +147,7 @@
                 $fieldsNotPopulated = array();
     
                 foreach($props as $property) {
-                    if (gettype($property) !== 'Field') continue;
+                    if (get_class($property) !== 'Field') continue;
                     if (!$property->isValueValid()) {
                         $fieldsNotPopulated[] = $property->getColumnName();
                     }
@@ -153,7 +162,7 @@
                         $columns = "";
                         $values = "";
                         foreach ($props as $property) {
-                            if (gettype($property) !== 'Field') continue;
+                            if (get_class($property) !== 'Field') continue;
                             $columns .= $property->getColumnName() . ',';
                             $values .= $property->formatSQLvalue() . ',';
                         }
@@ -169,11 +178,11 @@
                         
                         $this->modifiedTime->set(time());
     
-                        $query = "UPDATE Contact SET ";
+                        $query = "UPDATE LoginToken SET ";
                         $where = "WHERE ID=$id";
                         $details = "";
                         foreach($props as $property) {
-                            if (gettype($property) !== 'Field') continue;
+                            if (get_class($property) !== 'Field') continue;
                             $column = $property->getColumnName();
                             if ($column == 'createdTime') {
                                 continue;
@@ -190,10 +199,14 @@
                     
                 } else {
                     $message = "Required fields not populated - " . implode(', ', $fieldsNotPopulated); 
-                    throw new ContactException($message);
+                    throw new LoginTokenException($message);
                 }
             }
             
+        }
+
+        public static function checkToken($contactid, $token) {
+            // $loginToken = self::first("contactID = ")
         }
 
         public static function first($where) {

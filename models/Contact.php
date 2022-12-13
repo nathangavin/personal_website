@@ -1,6 +1,7 @@
 <?php
 
     require_once('Base.php');
+    require_once('Token/LoginToken.php');
 
     class ContactException extends BaseObjectException {
         public function __construct($message, $code = 0, $previous = null) {
@@ -66,10 +67,6 @@
             if (strlen($this->login->get()) > 0) {
                 $hash = password_hash($newPassword, PASSWORD_DEFAULT, ['cost' => 10]);
                 $this->passwordHash->set($hash);
-                echo '<pre>';
-                var_dump($this);
-                echo '</pre>';
-                
                 $this->save();
             } else {
                 throw new ContactException('Cannot set password of contact with no Login');
@@ -88,9 +85,15 @@
             $contact = self::first("Login = '$login'");
 
             if ($contact) {
-                $id = $contact->id->get();
+                $id = $contact->ID->get();
                 if (password_verify($password, $contact->passwordHash->get())) {
                     // provided password matched salted hash
+
+                    // create and save logintoken to db
+                    $loginToken = LoginToken::create();
+                    $loginToken->contactID = $id;
+                    $loginToken->generateToken();
+                    $loginToken->save();
 
                     return new LoginResponse(true, $id);
                 } else {
@@ -104,6 +107,9 @@
             }
         }
 
+        /**
+         * @return self
+         */
         public static function create() {
             return new self();
         }
@@ -208,6 +214,10 @@
             }
         }
 
+        /**
+         * @param int $id the id of the Contact to retrieve from the DB
+         * @return self
+         */
         public static function fetch($id) {
             $query = "SELECT * FROM Contact WHERE ID = $id;";
             $contactRow = SQL::select($query);
@@ -242,9 +252,6 @@
     
                 foreach($props as $property) {
                     if (gettype($property) !== 'Field') continue;
-                    // echo '<pre>';
-                    // // var_dump($property->isValueValid());
-                    // echo '</pre>';
                     
                     if (!$property->isValueValid()) {
                         $fieldsNotPopulated[] = $property->getColumnName();
@@ -260,7 +267,7 @@
                         $columns = "";
                         $values = "";
                         foreach ($props as $property) {
-                            if (gettype($property) !== 'Field') continue;
+                            if (get_class($property) !== 'Field') continue;
                             $columns .= $property->getColumnName() . ',';
                             $values .= $property->formatSQLvalue() . ',';
                         }
@@ -280,22 +287,18 @@
                         $where = "WHERE ID=$id";
                         $details = "";
                         
-                        //var_dump($props);
                         foreach($props as $property) {
-                            echo '<pre>';
-                            var_dump(get_class($property));
-                            echo '</pre>';
-                            
-                            if (gettype($property) !== 'Field') continue;
+                            if (get_class($property) !== 'Field') continue;
                             $column = $property->getColumnName();
                             if ($column == 'createdTime') {
                                 continue;
                             }
                             $details .= $column . "=" . $property->formatSQLvalue() . ", ";
-                            var_dump($details);
                         }
-                        $details = substr($details, 0, strlen($details) - 2);
-    
+                        if (strlen($details) == 0) {
+                            return;
+                        }
+                        $details = substr($details, 0, strlen($details) - 2);    
                         $query .= $details . ' ' . $where;
                         SQL::update($query);
                     }
@@ -312,6 +315,10 @@
 
         }
 
+        /**
+         * @param string $where a SQL where clause which filters Contact results
+         * @return self
+         */
         public static function first($where) {
             $query = "SELECT * FROM Contact WHERE $where;";
             $contactRow = SQL::select($query);
@@ -323,6 +330,10 @@
             return null;
         }
 
+        /**
+         * @param string $where a SQL where clause which filters Contact results
+         * @return Contact[]
+         */
         public static function find($where) {
 
             $query = "SELECT * FROM Contact WHERE $where;";

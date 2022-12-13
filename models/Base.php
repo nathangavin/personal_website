@@ -53,6 +53,7 @@
          */
         protected static function getValueFromRow($row, $key, $falseValue = null, $type = FieldTypeEnum::VARCHAR) {
             $value = isset($row[$key]) ? $row[$key] : $falseValue;
+            if (is_null($value)) return null;
             settype($value, $type);
             return $value;
         }

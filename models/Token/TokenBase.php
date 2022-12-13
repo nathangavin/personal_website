@@ -10,14 +10,14 @@
 
     abstract class TokenBase extends Base {
 
-        private $expiryTime;
-        private $token;
+        protected $expiryTime;
+        protected $token;
 
         protected function __construct($row = null) {
             parent::__construct($row);
 
-            $expiryTime = isset($row['expiryTime']) ? $row['expiryTime'] : null;
-            $token = isset($row['token']) ? $row['token'] : null;
+            $expiryTime = parent::getValueFromRow($row, 'expiryTime', null, FieldTypeEnum::BIGINT);
+            $token = parent::getValueFromRow($row, 'token');
 
             $this->expiryTime = new Field('expiryTime', 'BIGINT', $expiryTime, 'NOT NULL');
             $this->token = new Field('token', 'VARCHAR(100)', $token, 'NOT NULL');
@@ -47,10 +47,10 @@
         public function __set($property, $value) {
             switch($property) {
                 case 'expiryTime';
-                    throw new TokenException('Setting Salt not permitted');
+                    throw new TokenException('Setting expiryTime not permitted');
                     break;
                 case 'token';
-                    throw new TokenException('Setting Salt not permitted');
+                    throw new TokenException('Setting Token not permitted');
                     break;
                 default:
                     parent::__set($property, $value);
